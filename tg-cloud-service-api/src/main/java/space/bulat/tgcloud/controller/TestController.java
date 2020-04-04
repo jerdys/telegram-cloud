@@ -16,12 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class TestController {
 
-    @GetMapping
-    public ResponseEntity<String> test(@RequestParam(required = false) final String name) {
-        if (StringUtils.isEmpty(name)) {
-            return ResponseEntity.ok("Hello!");
-        } else {
-            return ResponseEntity.ok(String.format("Hello, %s", name));
-        }
+  @GetMapping
+  public ResponseEntity<String> test(@RequestParam(required = false) final String name) {
+    if (StringUtils.isEmpty(name)) {
+      return ResponseEntity.ok("Hello!");
+    } else {
+      return ResponseEntity.ok(String.format("Hello, %s", name));
     }
+  }
+
+  @GetMapping("/auth")
+  public ResponseEntity<String> getAuthentication(@RequestParam String id,
+      @RequestParam String first_name, @RequestParam String username,
+      @RequestParam String last_name, @RequestParam String photo_url,
+      @RequestParam String auth_date, @RequestParam String hash) {
+    return ResponseEntity.ok("Nice");
+  }
 }
