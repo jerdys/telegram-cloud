@@ -25,6 +25,7 @@
 
     <properties>
         <java.version>11</java.version>
+        <spring-data-jpa.version>2.2.6.RELEASE</spring-data-jpa.version>
         <!--<postgresql.version>42.2.12</postgresql.version>-->
     </properties>
 
