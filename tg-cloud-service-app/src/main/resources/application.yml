@@ -10,3 +10,4 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    open-in-view: false
