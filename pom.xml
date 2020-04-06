@@ -19,6 +19,7 @@
     <description>Open Source Cloud Storage based on Telegram API</description>
 
     <modules>
+        <module>tg-cloud-data-layer</module>
         <module>tg-cloud-service-api</module>
         <module>tg-cloud-service-app</module>
     </modules>
